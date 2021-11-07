@@ -8,5 +8,8 @@ import { Component } from '@angular/core';
 export class TabsPage {
 
   constructor() {}
-
+  
+  /* public async onTab2click(){
+    alert("Inside Courses");
+} */
 }
