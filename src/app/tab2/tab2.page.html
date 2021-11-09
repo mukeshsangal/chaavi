@@ -32,12 +32,18 @@
     </ion-card>
 
     <div *ngIf="chosenCourseFullName !== ''">
-    <ion-card *ngFor="let item of courseDetailsData;">
+    <ion-card *ngFor="let item of courseDetailsData; let i=index;">
       <ion-card-header>
         <ion-card-title>{{item.name}}</ion-card-title>
       </ion-card-header>
       <ion-card-content >
         {{ item.summary }}
+        <ion-list *ngFor="let module of toArray(item.modules); let j=index;">
+          <button ion-item (click)="onModuleClick(i,j)">
+            <img [src]= 'module.modicon'/>
+            {{ module.name }}
+          </button>
+          </ion-list>
       </ion-card-content>
     </ion-card>
     </div>

@@ -1,5 +1,8 @@
+import { CourseModules } from "./course-modules";
+
 export class CourseDetails {
-        sectionid: number;
-        sectionname: string;
+        id: number;
+        name: string;
         summary: string;
+        modules: CourseModules[];
 }
