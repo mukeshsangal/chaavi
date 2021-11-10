@@ -6,3 +6,9 @@ ion-card-header { position: relative }
     transform: translateY(-50%);
     size: 10px;
 }
+
+button.activitybtn {
+    --background : gray;
+    --background-activated: red;
+}
+

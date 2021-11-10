@@ -2,11 +2,17 @@ import { Component } from '@angular/core';
 import { GetUserCoursesService } from '../services/get-user-courses.service';
 import { GetCourseDetailsService } from '../services/get-course-details.service';
 import { GetModuleDetailsService } from '../services/get-module-details.service';
+import { GetFileService } from '../services/get-file.service';
+import { SetModuleStatusService } from '../services/set-module-status.service';
 import { Courses } from '../models/courses';
 import { CourseDetails } from '../models/course-details';
 import { CourseModules } from '../models/course-modules';
-import { NavController } from '@ionic/angular';
-import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
+//import { NavController } from '@ionic/angular';
+//import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
+import { fileURLToPath } from 'url';
+import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { File, IWriteOptions } from '@ionic-native/file/ngx';
+import { HTTP } from '@ionic-native/http/ngx';
 
 
 @Component({
@@ -25,8 +31,11 @@ export class Tab2Page {
     private getUserCourseService: GetUserCoursesService,
     private getCourseDetailsService: GetCourseDetailsService,
     private getModuleDetailsService: GetModuleDetailsService,
-    public navCtrl: NavController,
-    private iab: InAppBrowser
+    private getFile: GetFileService,
+    private setModuleStatus: SetModuleStatusService,
+    private file: File,
+    private fileOpener: FileOpener,
+    private http: HTTP
     ) {
   }
 
@@ -65,14 +74,34 @@ export class Tab2Page {
   }
 
   onModuleClick(i,j) {
-
+    var filepath = "";
     if (this.courseDetailsData[i].modules[j].modname == "resource")
     {
+      const url = this.courseDetailsData[i].modules[j].contents[0].fileurl + '&token=53a766eaf4a8d9bb7a3b3263fc935b08';
+      console.log("url: ", url);
+      const filepath = this.file.dataDirectory + "test.pdf";
+      console.log("filepath: ", filepath);
 
+      this.http.downloadFile(url,{},{},filepath).then(response => {
+        console.log("file downloaded: ", response);
+
+        this.fileOpener.open(filepath, 'application/pdf')
+        .then(() => console.log('File opened'))
+        .catch(e => console.log(e));
+
+      }).catch(err => {
+        console.log("error: ", err.status);
+        console.log("error: ", err.error);
+      });
+      }
     }
-    
-  /* const browser = this.iab.create(this.courseDetailsData[i].modules[j].url.toString());
 
-  browser.close(); */
-}
+    completionClicked(i,j){
+      const newstate = (this.courseDetailsData[i].modules[j].completiondata.state? 0:1);
+      this.setModuleStatus.setStatus("6",this.courseDetailsData[i].modules[j].id,newstate).subscribe(response => {
+        console.log(response);
+        this.courseDetailsData[i].modules[j].completiondata.state=newstate;
+        //console.log(this.courseDetailsData);
+    })
+    }
 }
