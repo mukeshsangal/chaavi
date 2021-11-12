@@ -6,6 +6,10 @@ const routes: Routes = [
   {
     path: '',
     component: Tab2Page,
+  },
+  {
+    path: 'h5p-display',
+    loadChildren: () => import('../pages/h5p-display/h5p-display.module').then( m => m.H5pDisplayPageModule)
   }
 ];
 

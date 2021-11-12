@@ -19,5 +19,9 @@
     <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser"/>
   </feature>
 
+  <feature name="Zip">
+    <param name="android-package" value="org.apache.cordova.Zip"/>
+  </feature>
+
   
 </widget>

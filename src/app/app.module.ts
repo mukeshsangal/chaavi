@@ -15,12 +15,14 @@ import { HTTP } from '@ionic-native/http/ngx';
 
 import { File } from '@ionic-native/file/ngx';
 import { FileOpener } from '@ionic-native/file-opener/ngx';
+import { ZipService } from './services/zip.service';
+import {Zip} from '@ionic-native/zip/ngx'
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, HttpClientModule],
-  providers: [File, FileOpener, HTTP, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [Zip, ZipService, File, FileOpener, HTTP, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
