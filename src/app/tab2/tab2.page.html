@@ -57,6 +57,11 @@
                 <ion-label>Mark done</ion-label>
               </ion-button>
           </ng-container>
+          <ng-container *ngIf="(bbbChosenModuleName == courseDetailsData[i].modules[j].name && courseDetailsData[i].modules[j].modname =='bigbluebuttonbn')">
+            <ion-button color="light" (click)="BBBJoinBtnclicked(i,j)">
+              <ion-label>Join Meeting</ion-label>
+            </ion-button>
+        </ng-container>
         </ng-container>
 
 
