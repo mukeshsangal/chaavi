@@ -13,6 +13,12 @@
     </ion-toolbar>
   </ion-header>
 
-  
-  
+  <ion-card *ngFor="let item of events; let i=index;">
+      <ion-card-header>
+        <ion-card-title color="secondary">{{item.name}}</ion-card-title>
+      </ion-card-header>
+      <ion-button (click)="eventActionButtonClicked(i)">
+        {{item.action.name}}
+      </ion-button>
+  </ion-card>
 </ion-content>

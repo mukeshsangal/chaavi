@@ -10,6 +10,14 @@ const routes: Routes = [
   {
     path: 'h5p-display',
     loadChildren: () => import('../pages/h5p-display/h5p-display.module').then( m => m.H5pDisplayPageModule)
+  },
+  {
+    path: 'assignment',
+    loadChildren: () => import('../pages/assignment/assignment.module').then( m => m.AssignmentPageModule)
+  },
+  {
+    path: 'bigbluebutton',
+    loadChildren: () => import('../pages/bigbluebutton/bigbluebutton.module').then( m => m.BigbluebuttonPageModule)
   }
 ];
 

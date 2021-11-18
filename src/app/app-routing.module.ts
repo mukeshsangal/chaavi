@@ -5,7 +5,12 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+  },  {
+    path: 'bigbluebutton',
+    loadChildren: () => import('./pages/bigbluebutton/bigbluebutton.module').then( m => m.BigbluebuttonPageModule)
   }
+
+
 ];
 @NgModule({
   imports: [
