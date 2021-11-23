@@ -4,7 +4,7 @@ import { GetActionEventsByCoursesService } from '../services/get-action-events-b
 import { GetUserCoursesService } from '../services/get-user-courses.service';
 import {ActionEvent} from '../models/event';
 import { NavController  } from '@ionic/angular';
-import { NavigationExtras } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 
 @Component({
   selector: 'app-tab1',
@@ -19,7 +19,8 @@ export class Tab1Page {
   constructor(
     private getActionEventsByCourses: GetActionEventsByCoursesService,
     private getUserCourseService: GetUserCoursesService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private router: Router
     ) {}
 
   ionViewWillEnter() {
@@ -52,7 +53,7 @@ export class Tab1Page {
 
   eventActionButtonClicked(i){
      if (this.events[i].modulename == 'bigbluebuttonbn') {
-        //Call the BigBlueButton page to Join Session
+        //Navigate to the BigBlueButton page to Join Session
         let navigationExtras: NavigationExtras = {
           queryParams: {
             cmid: this.events[i].instance,
@@ -61,7 +62,29 @@ export class Tab1Page {
           }
         };
         this.navCtrl.navigateForward(['/tabs/tab2/bigbluebutton'], navigationExtras);
-    } 
+    } else if (this.events[i].modulename == 'assign') {
+          //Navigate to the Assignment page
+          //Call the Assignment page
+          let navigationExtras: NavigationExtras = {
+            state: {
+              courseModule: {
+                id: this.events[i].instance,
+                name: this.events[i].name,
+                //completion: this.events[i].,
+                //modicon: Url;
+                url: this.events[i].url,
+                modname: this.events[i].modulename,
+                //contents: ModuleFileContents[];
+                //completiondata: Completiondata;
+                dates: [{label:'starts',timestamp:0},{label:'due',timestamp: this.events[i].timeusermidnight}]
+              },
+              chosenCourseId: this.events[i].course.id
+            }
+          };
+          //console.log("activity name: ", this.courseDetailsData[i].modules[j].name);
+          //this.navCtrl.navigateForward(['/tabs/tab2/assignment'], navigationExtras);
+           this.router.navigate(['/tabs/tab2/assignment'],navigationExtras);
+  } 
   }
 
 }

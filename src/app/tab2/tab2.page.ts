@@ -19,7 +19,7 @@ import { HTTP } from '@ionic-native/http/ngx';
 import { Zip } from '@ionic-native/zip/ngx';
 
 import { NavController  } from '@ionic/angular';
-import { NavigationExtras } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Http, HttpResponse } from '@capacitor-community/http';
@@ -66,7 +66,8 @@ export class Tab2Page {
     private httpClient: HttpClient,
     private iab: InAppBrowser,
     private diagnostic: Diagnostic,
-    private androidPermissions: AndroidPermissions
+    private androidPermissions: AndroidPermissions,
+    private router: Router
     ) {
   }
 
@@ -193,8 +194,16 @@ export class Tab2Page {
       } else if(this.courseDetailsData[i].modules[j].modname=="assign") {
         console.log("implement Assignment");
         
-
-
+          //Call the Assignment page
+           let navigationExtras: NavigationExtras = {
+            state: {
+              courseModule: this.courseDetailsData[i].modules[j],
+              chosenCourseId: this.chosenCourseId
+            }
+          };
+          console.log("activity name: ", this.courseDetailsData[i].modules[j].name);
+          //this.navCtrl.navigateForward(['/tabs/tab2/assignment'], navigationExtras);
+           this.router.navigate(['/tabs/tab2/assignment'],navigationExtras);
       } 
     }
 

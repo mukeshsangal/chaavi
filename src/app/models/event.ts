@@ -10,4 +10,5 @@ export class ActionEvent {
     name: string;
     url: Url;
     userid: number;
+    timeusermidnight: number;
 }

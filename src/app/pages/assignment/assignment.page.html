@@ -1,9 +1,38 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>assignment</ion-title>
+    <ion-title>Assignment</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title *ngIf="courseModule">{{courseModule.name}}</ion-card-title>
+    </ion-card-header>
+    <ion-item>
+      <ion-icon name="time-outline"></ion-icon>
+      <ion-label>Due by: {{dueDate}}</ion-label>
+      </ion-item>
+  
+    <ion-card-content *ngIf="assignment">
+      <p [innerHTML]="assignment.intro"></p>
+    </ion-card-content>
+<!--     <ion-item>
+      <ion-button fill="outline" slot="end" (click)="addSubmission()">Add Submission</ion-button>
+    </ion-item> -->
+  </ion-card>
+  <ion-button (click)="chooseFile()">Submit Assignment File</ion-button>
+  <ion-item *ngIf="chosenFileName">
+    <ion-label>{{ chosenFileName }}</ion-label>
+    <ion-button color="primary" expand="full" (click)="uploadFile()">Upload</ion-button>
+</ion-item>
+  <!--   <ion-card *ngIf="assignment">
+    <ion-card-header>
+      <ion-card-title>File Upload Section</ion-card-title>
+    </ion-card-header>
+    <ion-item>
+      <input type="file" (change)="onFileChange($event)" />
+    </ion-item>
+    <ion-button color="primary" expand="full" (click)="uploadFile()">Upload</ion-button>
+  </ion-card> -->
 </ion-content>
