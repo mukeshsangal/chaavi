@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Courses } from '../models/courses';
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
-
+import { EnvService } from './env.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +13,11 @@ import { retry, catchError } from 'rxjs/operators';
 export class GetUserCoursesService {
 
  // API path
-base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_enrol_get_users_courses&wstoken=53a766eaf4a8d9bb7a3b3263fc935b08&userid=6'; 
+base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_enrol_get_users_courses&wstoken='+this.envService.MOODLE_USER_TOKEN+'&userid='+this.envService.MOODLE_USER_ID; 
 
-constructor(private http: HttpClient) { }
+constructor(
+  private http: HttpClient,
+  public envService: EnvService) { }
 
 // Http Options
 httpOptions = {
@@ -24,12 +26,6 @@ httpOptions = {
   })
 }
 
-/*  ajaxData = {
-  wstoken: '53a766eaf4a8d9bb7a3b3263fc935b08',
-  wsfunction: 'core_enrol_get_users_courses',
-  moodlewsrestformat: 'json',
-  userid: '6'
-  } */
 
 // Handle API errors
 handleError(error: HttpErrorResponse) {

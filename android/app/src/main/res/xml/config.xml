@@ -48,6 +48,10 @@
     <param name="android-package" value="org.apache.cordova.mediacapture.Capture"/>
   </feature>
 
+  <feature name="NativeStorage">
+    <param name="android-package" value="NativeStorage"/>
+  </feature>
+
   <feature name="Zip">
     <param name="android-package" value="org.apache.cordova.Zip"/>
   </feature>

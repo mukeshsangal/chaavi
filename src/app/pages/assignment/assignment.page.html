@@ -21,11 +21,21 @@
       <ion-button fill="outline" slot="end" (click)="addSubmission()">Add Submission</ion-button>
     </ion-item> -->
   </ion-card>
-  <ion-button (click)="chooseFile()">Submit Assignment File</ion-button>
+  <ion-card>
+  <ion-item>
+    <ion-button (click)="chooseFile()">Select File</ion-button>
+  </ion-item>
   <ion-item *ngIf="chosenFileName">
-    <ion-label>{{ chosenFileName }}</ion-label>
-    <ion-button color="primary" expand="full" (click)="uploadFile()">Upload</ion-button>
+    <ion-label>Filename: {{ chosenFileName }}</ion-label>
 </ion-item>
+<ion-item *ngIf="chosenFileName">
+  <ion-button color="primary" expand="full" (click)="uploadFile()">Upload</ion-button>
+</ion-item>
+<ion-item *ngIf="submittedSuccessfully">
+  <ion-label>Assignment submitted.</ion-label>
+  <ion-label>Please Mark Complete on Course page.</ion-label>
+</ion-item>
+</ion-card>
   <!--   <ion-card *ngIf="assignment">
     <ion-card-header>
       <ion-card-title>File Upload Section</ion-card-title>

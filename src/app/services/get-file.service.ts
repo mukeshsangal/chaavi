@@ -5,7 +5,7 @@ import { File, IWriteOptions } from '@ionic-native/file/ngx';
 
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
-
+import { EnvService } from './env.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,16 +14,19 @@ import { retry, catchError } from 'rxjs/operators';
 export class GetFileService {
 
    // API path
-//base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_course_get_contents&wstoken=53a766eaf4a8d9bb7a3b3263fc935b08'; 
+//base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_course_get_contents&wstoken='+this.envService.MOODLE_USER_TOKEN; 
 
-constructor(private http: HTTP, private file: File) { }
+constructor(
+  private http: HTTP,
+  private file: File,
+  public envService: EnvService) { }
 
 
 // Get file from url
 get(url){
   const filepath = this.file.externalRootDirectory + "/Download/test.pdf";
   //const filepath = "file:///data/user/0/io.ionic.starter/files/test.pdf";
-  url = url + '&token=53a766eaf4a8d9bb7a3b3263fc935b08';
+  url = url + '&token='+this.envService.MOODLE_USER_TOKEN;
 
   console.log(url);
 

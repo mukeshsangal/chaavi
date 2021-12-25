@@ -32,6 +32,7 @@ import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+import { EnvService } from '../services/env.service';
 
 @Component({
   selector: 'app-tab2',
@@ -67,7 +68,8 @@ export class Tab2Page {
     private iab: InAppBrowser,
     private diagnostic: Diagnostic,
     private androidPermissions: AndroidPermissions,
-    private router: Router
+    private router: Router,
+    public envService: EnvService
     ) {
   }
 
@@ -112,7 +114,7 @@ export class Tab2Page {
     //send to Appropriate app like Google Drive App
     if (this.courseDetailsData[i].modules[j].modname == "resource")
     {
-      const url = this.courseDetailsData[i].modules[j].contents[0].fileurl + '&token=53a766eaf4a8d9bb7a3b3263fc935b08';
+      const url = this.courseDetailsData[i].modules[j].contents[0].fileurl + '&token='+this.envService.MOODLE_USER_TOKEN;
       console.log("url: ", url);
       filepath = this.file.dataDirectory + "test.pdf";
       console.log("filepath: ", filepath);
@@ -143,7 +145,7 @@ export class Tab2Page {
           filepath="";
 
           //Download H5P file that is clicked
-          const url = chosenH5PActivity[0].package[0].fileurl + '?token=53a766eaf4a8d9bb7a3b3263fc935b08';
+          const url = chosenH5PActivity[0].package[0].fileurl + '?token='+this.envService.MOODLE_USER_TOKEN;
           console.log("h5p file url: ", url);
           filepath = this.file.dataDirectory + chosenH5PActivity[0].package[0].filename;
           console.log("full filepath: ", filepath);

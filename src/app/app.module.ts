@@ -26,12 +26,17 @@ import { FileChooser } from '@ionic-native/file-chooser/ngx';
 import { FilePath } from '@ionic-native/file-path/ngx';
 import { FileTransfer} from '@ionic-native/file-transfer/ngx';
 
+import { NativeStorage } from '@ionic-native/native-storage/ngx';
+import { EnvService } from './services/env.service';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, HttpClientModule, NativeHttpModule],
-  providers: [ FileTransfer, FilePath, FileChooser, Base64, AndroidPermissions, Diagnostic, InAppBrowser,Zip, ZipService, File, FileOpener, HTTP, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    {provide: HttpBackend, useClass: NativeHttpFallback, deps: [Platform, NativeHttpBackend, HttpXhrBackend]}],
+  providers: [ FileTransfer, FilePath, FileChooser, Base64, AndroidPermissions, Diagnostic, 
+    InAppBrowser,Zip, ZipService, File, FileOpener, HTTP, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    {provide: HttpBackend, useClass: NativeHttpFallback, deps: [Platform, NativeHttpBackend, HttpXhrBackend]},
+  NativeStorage, EnvService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

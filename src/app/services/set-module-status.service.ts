@@ -5,7 +5,7 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { CourseDetails } from '../models/course-details';
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
-
+import { EnvService } from './env.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +14,11 @@ import { retry, catchError } from 'rxjs/operators';
 export class SetModuleStatusService {
 
    // API path
-base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_completion_update_activity_completion_status_manually&wstoken=53a766eaf4a8d9bb7a3b3263fc935b08';
+base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_completion_update_activity_completion_status_manually&wstoken='+this.envService.MOODLE_USER_TOKEN;
 
-constructor(private http: HttpClient) { }
+constructor(
+  private http: HttpClient,
+  public envService: EnvService) { }
 
 // Http Options
 httpOptions = {

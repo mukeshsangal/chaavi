@@ -17,6 +17,7 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
+import { EnvService } from 'src/app/services/env.service';
 
 @Component({
   selector: 'app-assignment',
@@ -33,6 +34,7 @@ export class AssignmentPage {
   file2:any
   chosenFileName:string = "";  
   uploadFilePath: string;
+  submittedSuccessfully: boolean = false;
 
   constructor(
     private route: ActivatedRoute, 
@@ -45,7 +47,8 @@ export class AssignmentPage {
     private http: HTTP,
     private httpClient: HttpClient,
     private base64: Base64,
-    private file: File
+    private file: File,
+    public envService: EnvService
     ) 
     { 
       this.route.queryParams.subscribe(params => {
@@ -77,6 +80,7 @@ export class AssignmentPage {
       console.log(response);
       this.uploadFilePath = response;
       this.chosenFileName=this.uploadFilePath.substring(this.uploadFilePath.lastIndexOf('/') + 1);
+      this.submittedSuccessfully=false;
   });
 }
 
@@ -90,7 +94,7 @@ export class AssignmentPage {
   }
 
   uploadFile(){
-    const url = "https://chaavi.in/moodle/webservice/upload.php?token=53a766eaf4a8d9bb7a3b3263fc935b08";
+    const url = "https://chaavi.in/moodle/webservice/upload.php?token="+this.envService.MOODLE_USER_TOKEN;
     
     const fileTransfer: FileTransferObject = this.transfer.create();
     
@@ -108,7 +112,7 @@ export class AssignmentPage {
       const itemid = JSON.parse(data.response)[0].itemid;
       //console.log(itemid);
       //Call Moodle WS mod_assign_get_assignments
-      var base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wstoken=53a766eaf4a8d9bb7a3b3263fc935b08'; 
+      var base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wstoken='+this.envService.MOODLE_USER_TOKEN; 
       const wsfunction = 'mod_assign_save_submission';
       const paramString = '&assignmentid=1&plugindata[onlinetext_editor][itemid]='+ 
         itemid +'&plugindata[files_filemanager]='+ itemid +
@@ -124,6 +128,7 @@ export class AssignmentPage {
       ).subscribe( response3 => {
      // this.callMoodleWsService.callWS(wsfunction, paramString).subscribe( response3 => {
         console.log(response3);
+        this.submittedSuccessfully=true;
       });
 
     }, (err) => {

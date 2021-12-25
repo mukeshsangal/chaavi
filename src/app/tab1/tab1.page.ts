@@ -6,27 +6,36 @@ import {ActionEvent} from '../models/event';
 import { NavController  } from '@ionic/angular';
 import { NavigationExtras, Router } from '@angular/router';
 
+// import { AuthService } from 'src/app/services/auth.service';
+import { User } from 'src/app/models/user';
+import { EnvService } from '../services/env.service';
+
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss']
 })
 export class Tab1Page {
-  
+
   coursesData: Courses[];
   events: ActionEvent[];
+  //private user: User;
+  numNotifications: number;
 
   constructor(
     private getActionEventsByCourses: GetActionEventsByCoursesService,
     private getUserCourseService: GetUserCoursesService,
     private navCtrl: NavController,
-    private router: Router
+    private router: Router,
+    //private authService: AuthService,
+    public envService: EnvService
     ) {}
 
   ionViewWillEnter() {
     // Used ionViewWillEnter as ngOnInit is not 
     // called due to view persistence in Ionic
     //this.getAllCourses();
+    //this.user.id = this.envService.MOODLE_USER_ID;
     this.getActionEvents();
   }
 
@@ -44,9 +53,10 @@ export class Tab1Page {
     /* const arrayCourseIds = (arr, n) => arr.map(x => 'courseids[]='+x[n]);
     const courseIds = arrayCourseIds(this.coursesData, 'id').toString().replace(",","&");
     console.log(courseIds); */
-    this.getActionEventsByCourses.getActionEvents("6").subscribe(response => {
+    this.getActionEventsByCourses.getActionEvents(this.envService.MOODLE_USER_ID).subscribe(response => {
       console.log(response);
       this.events=response.events;
+      this.numNotifications = this.events.length;
       console.log(this.events);    
   })
   }

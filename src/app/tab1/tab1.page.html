@@ -12,7 +12,7 @@
       <ion-title size="large">Notifications</ion-title>
     </ion-toolbar>
   </ion-header>
-
+  <div *ngIf="numNotifications">
   <ion-card *ngFor="let item of events; let i=index;">
       <ion-card-header>
         <ion-card-title color="secondary">{{item.name}}</ion-card-title>
@@ -21,4 +21,9 @@
         {{item.action.name}}
       </ion-button>
   </ion-card>
+</div>
+<ion-item *ngIf="!numNotifications">
+  No New Notifications. Checkout Courses Tab.
+</ion-item>
+
 </ion-content>

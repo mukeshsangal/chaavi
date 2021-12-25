@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 
+
 @Component({
   selector: 'app-tabs',
   templateUrl: 'tabs.page.html',
@@ -7,8 +8,13 @@ import { Component } from '@angular/core';
 })
 export class TabsPage {
 
+
   constructor() {}
   
+  ionViewWillEnter() {
+
+  }
+
   /* public async onTab2click(){
     alert("Inside Courses");
 } */

@@ -7,9 +7,11 @@ import { BbbMeetingService } from '../../services/bbb-meeting.service';
 import { Bbb } from '../../models/bbb';
 import {parseString} from 'xml2js';
 import { XmlResponse } from '../../models/xml-response';
-import { ToastController  } from '@ionic/angular';
+
 import CryptoJS from 'crypto-js';
 import { HTTP } from '@ionic-native/http/ngx';
+
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-bigbluebutton',
@@ -30,8 +32,8 @@ export class BigbluebuttonPage  {
     private route: ActivatedRoute,
     private bbbMeeting: BbbMeetingService,
     private getBigbluebuttonModules : GetBigbluebuttonModulesService,
-    public toast: ToastController,
-    private http: HTTP
+    private http: HTTP,
+    private alertService: AlertService
   ) { }
 
   ionViewWillEnter() {
@@ -108,7 +110,7 @@ export class BigbluebuttonPage  {
           }) */
         } else if (result.returncode == "FAILED") {
           console.log("Meeting Not Found");
-          this.showToast("Class not started. Please try after 1min");
+          this.alertService.presentToast("Class not started. Please try after 1min");
         }
   })
   }
@@ -126,7 +128,7 @@ export class BigbluebuttonPage  {
   } 
 
 
-  showToast(msg: string) {
+ /*  showToast(msg: string) {
     this.myToast = this.toast.create({
       message: msg,
       duration: 4000
@@ -134,6 +136,6 @@ export class BigbluebuttonPage  {
       console.log(toastData);
       toastData.present();
     });
-  }
+  } */
 
 }
