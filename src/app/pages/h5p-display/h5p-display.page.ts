@@ -13,6 +13,11 @@ import { ActivatedRoute } from "@angular/router";
 @Injectable({
   providedIn: 'root'
 })
+
+//Page to display the H5P interactive content
+//This Page loads only after the H5P has been downloaded from Moodle and unzipped
+//Here the path to H5P file is provided to a module which displays H5P
+//Module obtained from: https://github.com/tunapanda/h5p-standalone
 export class H5pDisplayPage {
 
   activityName: string="";
@@ -21,10 +26,12 @@ export class H5pDisplayPage {
   ionViewWillEnter() {
     // Used ionViewWillEnter as ngOnInit is not 
     // called due to view persistence in Ionic
+   
     this.route.queryParams.subscribe(params => {
       const h5pFolderPath = Capacitor.convertFileSrc(JSON.parse(params["h5pFolderPath"]));
       this.activityName = params["activityName"];
       console.log("inside H5PPage: ", this.activityName);
+      //following is the format in which the H5P display module expects
       const el = document.getElementById('h5p-container');
       const options = {
           h5pJsonPath: h5pFolderPath,

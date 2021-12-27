@@ -9,10 +9,7 @@ import { ToastController } from '@ionic/angular';
 
 import { FileChooser } from '@ionic-native/file-chooser/ngx';
 import { FilePath } from '@ionic-native/file-path/ngx';
-import { File, FileEntry } from '@ionic-native/file/ngx';
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer/ngx';
-import {HTTP} from "@ionic-native/http/ngx";
-import { Base64 } from '@ionic-native/base64/ngx';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 
 import { Observable, throwError } from 'rxjs';
@@ -25,6 +22,7 @@ import { EnvService } from 'src/app/services/env.service';
   styleUrls: ['./assignment.page.scss'],
 })
 
+//This Class is to display the page for uploading Assignment submission file
 export class AssignmentPage {
 
   courseModule: CourseModules;
@@ -44,17 +42,15 @@ export class AssignmentPage {
     private fileChooser: FileChooser,
     private filePath: FilePath,
     private transfer: FileTransfer,
-    private http: HTTP,
     private httpClient: HttpClient,
-    private base64: Base64,
-    private file: File,
     public envService: EnvService
     ) 
-    { 
+    {
+      //Loading the Assignment related details needs Course Module and Course Id
+      //These are received here as parameters 
       this.route.queryParams.subscribe(params => {
       this.courseModule= this.router.getCurrentNavigation().extras.state.courseModule;
       this.chosenCourseId = this.router.getCurrentNavigation().extras.state.chosenCourseId;
-      //this.assignmentName=this.courseModule.name;
       console.log(this.courseModule);
       const timestamp = this.courseModule.dates[1].timestamp*1000
       var todate=new Date(timestamp).getDate();
@@ -62,11 +58,13 @@ export class AssignmentPage {
       var toyear=new Date(timestamp).getFullYear();
       this.dueDate=todate+'/'+tomonth+'/'+toyear;
 
-      //Call Moodle WS mod_assign_get_assignments
+      //Call Moodle WS mod_assign_get_assignments to get Assignment details
       var wsfunction = 'mod_assign_get_assignments';
       var paramString = '&courseids[0]='+this.chosenCourseId;
       this.callMoodleWsService.callWS(wsfunction, paramString).subscribe( response => {
         console.log(response);
+        //since Moodle WS returns all assignments, filter as below 
+        //to choose particular assignment module matching the one clicked
         this.assignment = response.courses[0].assignments.filter(x => x.cmid == this.courseModule.id)[0];
         console.log(this.assignment);
         wsfunction="";
@@ -75,6 +73,7 @@ export class AssignmentPage {
     });
   }
 
+  //For selecting a File to upload from the Mobile file system
   chooseFile(){
      this.openFileChooser().then(response => {
       console.log(response);
@@ -84,18 +83,22 @@ export class AssignmentPage {
   });
 }
 
+  //After lot of iteration following is the way Android returned File Path in the required format
   openFileChooser(): Promise<any> {
 
      return this.fileChooser.open().then((fileuri)  => {
-      return this.filePath.resolveNativePath(fileuri)/*.then(resolvedNativePath => {
-        return this.file.resolveLocalFilesystemUrl(resolvedNativePath);
-      });*/
+      return this.filePath.resolveNativePath(fileuri)
     }); 
   }
 
+  //File uploaded to Moodle using 2 steps:
+  //1. Upload file using FileTransferObject and Url pointing to Moodle web service upload.php . This returns an item id
+  //2. Use the usual Moodle WS function via server.php & function name mod_assign_save_submission using item id above
+  //Possibly step 2 can use call-moodle-ws-service. Can be explored...
   uploadFile(){
-    const url = "https://chaavi.in/moodle/webservice/upload.php?token="+this.envService.MOODLE_USER_TOKEN;
-    
+  
+    const url = this.envService.MOODLE_FILE_UPLOAD_URL+"?token="+this.envService.MOODLE_USER_TOKEN;  
+    //After 2-3 days of trying different ways, only FileTransferObject was working to upload to Moodle
     const fileTransfer: FileTransferObject = this.transfer.create();
     
     let options: FileUploadOptions = {
@@ -106,11 +109,9 @@ export class AssignmentPage {
 
    fileTransfer.upload(this.uploadFilePath, url, options)
     .then((data) => {
-      // success
-      //console.log('full data: ',data,' data.response: ',data.response);
-      //,' data.response[0]: ',data.response[0],' JSON.parse(data.response[0]): ',JSON.parse(data.response[0]));
+      //the itemid returned by Moodle is used in the next step to refer to the file that was uploaded
       const itemid = JSON.parse(data.response)[0].itemid;
-      //console.log(itemid);
+
       //Call Moodle WS mod_assign_get_assignments
       var base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wstoken='+this.envService.MOODLE_USER_TOKEN; 
       const wsfunction = 'mod_assign_save_submission';
@@ -126,7 +127,6 @@ export class AssignmentPage {
         retry(2),
         catchError(this.handleError)
       ).subscribe( response3 => {
-     // this.callMoodleWsService.callWS(wsfunction, paramString).subscribe( response3 => {
         console.log(response3);
         this.submittedSuccessfully=true;
       });

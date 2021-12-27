@@ -17,9 +17,6 @@
     <ion-card-content *ngIf="assignment">
       <p [innerHTML]="assignment.intro"></p>
     </ion-card-content>
-<!--     <ion-item>
-      <ion-button fill="outline" slot="end" (click)="addSubmission()">Add Submission</ion-button>
-    </ion-item> -->
   </ion-card>
   <ion-card>
   <ion-item>
@@ -36,13 +33,4 @@
   <ion-label>Please Mark Complete on Course page.</ion-label>
 </ion-item>
 </ion-card>
-  <!--   <ion-card *ngIf="assignment">
-    <ion-card-header>
-      <ion-card-title>File Upload Section</ion-card-title>
-    </ion-card-header>
-    <ion-item>
-      <input type="file" (change)="onFileChange($event)" />
-    </ion-item>
-    <ion-button color="primary" expand="full" (click)="uploadFile()">Upload</ion-button>
-  </ion-card> -->
 </ion-content>

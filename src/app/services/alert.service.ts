@@ -4,6 +4,8 @@ import { ToastController } from '@ionic/angular';
 @Injectable({
   providedIn: 'root'
 })
+
+//For displaying Toast alerts
 export class AlertService {
 
   constructor(private toastController: ToastController) { }

@@ -13,8 +13,9 @@ import { EnvService } from './env.service';
 
 export class GetFileService {
 
-   // API path
-//base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_course_get_contents&wstoken='+this.envService.MOODLE_USER_TOKEN; 
+  //For some unknown reason this Service file didnt work and 
+  //so the GetFile code was run directly from the tab2.page.ts itself
+  //So as such this code file is not used. Kept it here in case this is needed later.
 
 constructor(
   private http: HTTP,
@@ -25,9 +26,8 @@ constructor(
 // Get file from url
 get(url){
   const filepath = this.file.externalRootDirectory + "/Download/test.pdf";
-  //const filepath = "file:///data/user/0/io.ionic.starter/files/test.pdf";
+  //this is the format of the filepath "file:///data/user/0/io.ionic.starter/files/test.pdf";
   url = url + '&token='+this.envService.MOODLE_USER_TOKEN;
-
   console.log(url);
 
  this.http.downloadFile(url,{},{},filepath).then(response => {

@@ -9,6 +9,9 @@ import * as JSZip from 'jszip';
  * Emulates the Cordova Zip plugin in browser.
  */
 @Injectable()
+
+//Originally included to Unzip H5P files before they can be displayed.
+//Currently not used. Kept for later reference if needed.
 export class ZipService {
 
     constructor(private file: File) {

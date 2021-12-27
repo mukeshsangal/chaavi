@@ -14,12 +14,14 @@
       </ion-list-header> -->
     
       <ion-item>
+        <!-- Dropdown for Choosing Course-->
         <ion-label>Choose Course</ion-label>
          <ion-select interface="popover"  (ionChange)="onCourseChange($event)">
           <ion-select-option *ngFor="let item of coursesData;" value="{{ item.id }}">{{ item.fullname }}</ion-select-option>
         </ion-select>
       </ion-item>
 
+  <!-- Details of Chosen course -->
   <ion-card *ngIf="chosenCourseFullName !== ''">
       <ion-icon name="book-outline" className="center-right" size="large"></ion-icon>
       <ion-card-header>
@@ -31,6 +33,7 @@
       </ion-card-content>
     </ion-card>
 
+    <!-- List of Sections of the Chosen Course-->
     <div *ngIf="chosenCourseFullName !== ''">
     <ion-card *ngFor="let item of courseDetailsData; let i=index;">
       <ion-card-header>
@@ -38,6 +41,7 @@
       </ion-card-header>
       <ion-card-content >
         {{ item.summary }}
+        <!-- List of Activities/Modules within each Section of the chosen Course-->
         <ion-list>
           <ion-item *ngFor="let module of toArray(item.modules); let j=index;">
             <ion-button ion-item (click)="onModuleClick(i,j)" class="activitynamebtn">

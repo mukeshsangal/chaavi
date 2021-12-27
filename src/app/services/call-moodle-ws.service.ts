@@ -10,10 +10,9 @@ import { EnvService } from './env.service';
   providedIn: 'root'
 })
 
+//Common Moodle WS call Service for all Function calls
 export class CallMoodleWsService {
 
-   // API path
-base_path = 'https://chaavi.in/moodle/webservice/rest/server.php?moodlewsrestformat=json&wstoken='+this.envService.MOODLE_USER_TOKEN; 
 
 constructor(
   private http: HttpClient,
@@ -45,10 +44,13 @@ handleError(error: HttpErrorResponse) {
 
 // Call Moodle WS
 callWS(wsfunction, paramString): Observable<any> {
-  this.base_path = this.base_path + '&wsfunction='+ wsfunction + paramString;
+  // API path + Token
+  var base_path = this.envService.MOODLE_API_URL + '&wstoken='+this.envService.MOODLE_USER_TOKEN; 
+  //Add parameters for Moodle Function name and other parameters as passed while calling this Service
+  base_path = base_path + '&wsfunction='+ wsfunction + paramString;
   
   return this.http
-  .get<any>(this.base_path)
+  .get<any>(base_path)
   .pipe(
     retry(2),
     catchError(this.handleError)

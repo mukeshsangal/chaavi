@@ -1,15 +1,10 @@
 import { Component } from '@angular/core';
-import { GetUserCoursesService } from '../services/get-user-courses.service';
-import { GetCourseDetailsService } from '../services/get-course-details.service';
-import { GetModuleDetailsService } from '../services/get-module-details.service';
-import { GetFileService } from '../services/get-file.service';
-import { SetModuleStatusService } from '../services/set-module-status.service';
-import { GetH5pFileUrlsService } from '../services/get-h5p-file-urls.service';
+import { CallMoodleWsService } from '../services/call-moodle-ws.service';
 
 import { Courses } from '../models/courses';
 import { CourseDetails } from '../models/course-details';
 import { CourseModules } from '../models/course-modules';
-import { H5pActivities } from '../modules/h5p-activities';
+import { H5pActivities } from '../models/h5p-activities';
 
 
 import { FileOpener } from '@ionic-native/file-opener/ngx';
@@ -33,6 +28,7 @@ import { Diagnostic } from '@ionic-native/diagnostic/ngx';
 
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
 import { EnvService } from '../services/env.service';
+import { param } from 'jquery';
 
 @Component({
   selector: 'app-tab2',
@@ -41,7 +37,7 @@ import { EnvService } from '../services/env.service';
 })
 
 
-
+//As of now the most important Tab Page which displays all Course details
 export class Tab2Page {
 
   coursesData : Courses[];
@@ -52,12 +48,7 @@ export class Tab2Page {
   h5pActivities: H5pActivities[];
 
   constructor(
-    private getUserCourseService: GetUserCoursesService,
-    private getCourseDetailsService: GetCourseDetailsService,
-    private getModuleDetailsService: GetModuleDetailsService,
-    private getFile: GetFileService,
-    private setModuleStatus: SetModuleStatusService,
-    private getH5pFileUrlsService: GetH5pFileUrlsService,
+    private callMoodleWs: CallMoodleWsService,
     private file: File,
     private fileOpener: FileOpener,
     private http: HTTP,
@@ -79,34 +70,41 @@ export class Tab2Page {
     this.getAllCourses();
   }
 
+  //Get list of Courses enrolled by User and list in a Dropdown
   getAllCourses() {
-    //Get saved list of courses
-    this.getUserCourseService.getList().subscribe(response => {
+    //Get list of courses for the user
+    const paramString = '&userid='+this.envService.MOODLE_USER_ID;
+    this.callMoodleWs.callWS('core_enrol_get_users_courses',paramString).subscribe(response => {
       console.log(response);
       this.coursesData=response;
     })
-    
   }
 
+  //Function executes when a Course is selected. Displays Course details.
   onCourseChange(event){
-    //alert('inside ionChange' + this.coursesData.filter(x => x.id == event.detail.value)[0].fullname);
+
+    //Id, Summary and Name of chosen course is stored for use at various points
     this.chosenCourseId=this.coursesData.filter(x => x.id == event.detail.value)[0].id;
     this.chosenCourseSummary = this.coursesData.filter(x => x.id == event.detail.value)[0].summary.replace(/<\/?[^>]+(>|$)/g, "");
     this.chosenCourseFullName = this.coursesData.filter(x => x.id == event.detail.value)[0].fullname;
-    this.getCourseDetailsService.getDetail(this.coursesData.filter(x => x.id == event.detail.value)[0].id).subscribe(response => {
-      console.log(response);
-      this.courseDetailsData=response;
-      for (let i=0; i<this.courseDetailsData.length;i++){
-          this.courseDetailsData[i].summary=this.courseDetailsData[i].summary.replace(/<\/?[^>]+(>|$)/g, "");
-      }
-      //console.log(this.courseDetailsData);
-  })
+  
+      //Call Moodle WS to get details fo Chosen Course
+      const paramString = '&courseid='+this.coursesData.filter(x => x.id == event.detail.value)[0].id;
+      this.callMoodleWs.callWS('core_course_get_contents',paramString).subscribe(response => {
+        console.log(response);
+        this.courseDetailsData=response;
+        for (let i=0; i<this.courseDetailsData.length;i++){
+            this.courseDetailsData[i].summary=this.courseDetailsData[i].summary.replace(/<\/?[^>]+(>|$)/g, "");
+        }
+        //console.log(this.courseDetailsData);
+      })
   }
 
   toArray(courseModules: object) {
     return Object.keys(courseModules).map(key => courseModules[key])
   }
 
+  //Function executed when User clicks on an Activity/Module within the Course
   onModuleClick(i,j) {
     var filepath = "";
     //If the Course->Activity is a File Activity 
@@ -137,7 +135,8 @@ export class Tab2Page {
       } else if(this.courseDetailsData[i].modules[j].modname=="h5pactivity") {
         //Get H5P file URLs
         console.log("implementing h5p");
-        this.getH5pFileUrlsService.getURLs(this.chosenCourseId).subscribe(response => {
+        const paramString = '&courseids[0]=' + this.chosenCourseId;
+        this.callMoodleWs.callWS('mod_h5pactivity_get_h5pactivities_by_courses',paramString).subscribe(response => {
           console.log(response);
           this.h5pActivities=response.h5pactivities;
           const chosenH5PActivity=this.h5pActivities.filter(x => x.coursemodule == this.courseDetailsData[i].modules[j].id);
@@ -187,7 +186,6 @@ export class Tab2Page {
             queryParams: {
               cmid: this.courseDetailsData[i].modules[j].id,
               courseid: this.courseDetailsData[i].id
-              //modulename: this.courseDetailsData[i].modules[j].name
             }
           };
           console.log("activity name: ", this.courseDetailsData[i].modules[j].name);
@@ -204,30 +202,22 @@ export class Tab2Page {
             }
           };
           console.log("activity name: ", this.courseDetailsData[i].modules[j].name);
-          //this.navCtrl.navigateForward(['/tabs/tab2/assignment'], navigationExtras);
            this.router.navigate(['/tabs/tab2/assignment'],navigationExtras);
       } 
     }
 
+    //Function which changes the completion status of the Activity from Mark Done to Done and vice-versa
     completionClicked(i,j){
       const newstate = (this.courseDetailsData[i].modules[j].completiondata.state? 0:1);
-      this.setModuleStatus.setStatus("6",this.courseDetailsData[i].modules[j].id,newstate).subscribe(response => {
-        console.log(response);
-        this.courseDetailsData[i].modules[j].completiondata.state=newstate;
-        //console.log(this.courseDetailsData);
+    
+    //Call Moodle WS function to change Activity's completion status
+    const paramString = '&cmid='+this.courseDetailsData[i].modules[j].id+'&completed='+newstate;
+    this.callMoodleWs.callWS('core_completion_update_activity_completion_status_manually', paramString).subscribe(response => {
+      console.log(response);
+      this.courseDetailsData[i].modules[j].completiondata.state=newstate;
     })
-    }
- 
 
-
-
-/*     permCallBackSuccess(url: string) {
-      const browser = this.iab.create(url,'_self');
-    }
-
-    permCallBackError(){
-      console.log("Mike Permission request didnt work")
-    } */
+  }
 
 
 
@@ -250,7 +240,8 @@ handleError(error: HttpErrorResponse) {
 
 
 
-//old code to set Camera and Microphone permissions
+//This was an attempt to open BBB video call within App using InAppBrowser. It didnt work.
+//This code was to set Camera and Microphone permissions
 //Get Microphone and Camera permission at runtime before opening InAppBrowser
 /* var cameraPermission=0;
 var microphonePermission=0;
@@ -325,4 +316,5 @@ if (microphonePermission == 0 && cameraPermission == 0) {
                   const browser = this.iab.create(result.url[0],'_self', "location=no");
                     //, this.permCallBackSuccess(result.url[0]), this.permCallBackError); */
 
+                    
 }

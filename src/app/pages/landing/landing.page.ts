@@ -9,6 +9,9 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './landing.page.html',
   styleUrls: ['./landing.page.scss'],
 })
+
+//Landing page for allowing Login
+//When not logged in or when user logs out, this page is loaded
 export class LandingPage implements OnInit {
 
   constructor(
@@ -19,6 +22,8 @@ export class LandingPage implements OnInit {
   ) { 
     this.menu.enable(false);
   }
+
+  //If logged in i.e. Moodle Token is there, then navigate to show Tabs
   ionViewWillEnter() {
     this.authService.getToken().then(() => {
       if(this.authService.isLoggedIn) {
@@ -29,12 +34,16 @@ export class LandingPage implements OnInit {
   ngOnInit() {
     
   }
+
+  //Display the Register dialog box
   async register() {
     const registerModal = await this.modalController.create({
       component: RegisterPage
     });
     return await registerModal.present();
   }
+
+  //Display the Login dialog box
   async login() {
     const loginModal = await this.modalController.create({
       component: LoginPage,

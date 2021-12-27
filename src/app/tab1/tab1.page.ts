@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Courses } from '../models/courses';
-import { GetActionEventsByCoursesService } from '../services/get-action-events-by-courses.service';
-import { GetUserCoursesService } from '../services/get-user-courses.service';
+import { CallMoodleWsService } from '../services/call-moodle-ws.service';
 import {ActionEvent} from '../models/event';
 import { NavController  } from '@ionic/angular';
 import { NavigationExtras, Router } from '@angular/router';
@@ -15,6 +14,8 @@ import { EnvService } from '../services/env.service';
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss']
 })
+
+//Tab 1 Page is mainly for Pending Action items for Attending Live class, pending Assignments etc.
 export class Tab1Page {
 
   coursesData: Courses[];
@@ -23,8 +24,7 @@ export class Tab1Page {
   numNotifications: number;
 
   constructor(
-    private getActionEventsByCourses: GetActionEventsByCoursesService,
-    private getUserCourseService: GetUserCoursesService,
+    private callMoodleWs: CallMoodleWsService,
     private navCtrl: NavController,
     private router: Router,
     //private authService: AuthService,
@@ -39,28 +39,22 @@ export class Tab1Page {
     this.getActionEvents();
   }
 
-  /* getAllCourses() {
-    //Get saved list of courses
-    this.getUserCourseService.getList().subscribe(response => {
-      console.log(response);
-      this.coursesData = response;
-      this.getActionEvents();
-    }) 
-    
-  }*/
-
+  //Currently the Calendar action events are obtained through Moodle WS and listed here
+  //More Action items may come up here later
   getActionEvents(){
     /* const arrayCourseIds = (arr, n) => arr.map(x => 'courseids[]='+x[n]);
     const courseIds = arrayCourseIds(this.coursesData, 'id').toString().replace(",","&");
     console.log(courseIds); */
-    this.getActionEventsByCourses.getActionEvents(this.envService.MOODLE_USER_ID).subscribe(response => {
-      console.log(response);
-      this.events=response.events;
-      this.numNotifications = this.events.length;
-      console.log(this.events);    
-  })
+  const paramString = '&userid=' + this.envService.MOODLE_USER_ID;
+  this.callMoodleWs.callWS('core_calendar_get_action_events_by_timesort', paramString).subscribe(response => {
+    console.log(response);
+    this.events=response.events;
+    this.numNotifications = this.events.length;
+    console.log(this.events);    
+})
   }
 
+  //Process the Action in case the User clicks on a button of an Action item
   eventActionButtonClicked(i){
      if (this.events[i].modulename == 'bigbluebuttonbn') {
         //Navigate to the BigBlueButton page to Join Session

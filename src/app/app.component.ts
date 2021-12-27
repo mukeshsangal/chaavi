@@ -10,6 +10,7 @@ import { AlertService } from './services/alert.service';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
+
 export class AppComponent {
   constructor(
     private authService: AuthService,
@@ -29,8 +30,9 @@ export class AppComponent {
      });
   }
 
+  //Currently Logout is handled directly within Auth service and this is not used.
   // When Logout Button is pressed 
-  logout() {
+  /* logout() {
     this.authService.logout().subscribe(
       data => {
         this.alertService.presentToast(data['message']);        
@@ -42,6 +44,6 @@ export class AppComponent {
         this.navCtrl.navigateRoot('/landing');
       }
     );
-  }
+  } */
 
 }
