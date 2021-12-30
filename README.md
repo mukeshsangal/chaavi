@@ -1,6 +1,7 @@
 # NLightN App (currently called Chaavi, name needs to change)
 
 **Brief description of project**
+
 This code project is nothing but a lighter App for Moodle (lighter in functionality compared to the Moodle official App).
 It is build on the Ionic-Angular-Capacitor framework. It connects to a Moodle server (currently on Google Cloud) and enables the following functionality
 a. Attending Video classes (using BigBlueButton, called BBB henceforth, which is currently on a Test Sever provided by Blindside Networks)
@@ -21,6 +22,7 @@ d. Tutor has to login to BBB session using Moodle server login and only then Stu
 
 
 **Broad requirements**
+
 1. Ionic framework with Capacitor (Ionic version: 6.18.0)
 2. Access to the GitHub chaavi project
 3. Android Studio (Arctic Fox | 2020.3.1 Patch 2)
@@ -30,6 +32,7 @@ d. Tutor has to login to BBB session using Moodle server login and only then Stu
 
 
 **Installation**
+
 1. Install Ionic: https://ionicframework.com/docs/v1/guide/installation.html (Capacitor documentation says Capacitor now comes by default with Ionic, if so Capacitor need not be separately installed)
 2. Clone this project from GitHub as an Ionic app
 3. To view on Web Browser (native functions have been used for Files and Video call which don't work on Web as of now)
@@ -42,6 +45,7 @@ d. Tutor has to login to BBB session using Moodle server login and only then Stu
     Run 'app' to Build and Install and Launch on target device
 
 **Running the app**
+
 1. Once the App launches use the username/pwd to Login (Reach out to Sreekanth for the credentials)
 2. Tab 1: Action items are listed here
     a. If it shows Submit Assignment, try submitting a File
