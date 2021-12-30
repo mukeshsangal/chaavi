@@ -55,11 +55,17 @@ d. Tutor has to login to BBB session using Moodle server login and only then Stu
     Command for Ionic CLI: ionic serve
 
 4. To install on Mobile:
+
     on Ionic CLI: ionic capacitor sync
+
     Then in Android Studio:
+    
     Open the project
+    
     Select the desired Target Device from the Available Devices dropdown: either Mobile or Emulator
+    
     Run 'app' to Build and Install and Launch on target device
+    
 
 **Running the app**
 
@@ -70,8 +76,11 @@ d. Tutor has to login to BBB session using Moodle server login and only then Stu
     a. If it shows Submit Assignment, try submitting a File
     
     b. It it says Join Class
+    
         go to https://chaavi.in/moodle/ and login as Tutor (Reach out to Sreekanth for the credentials)
+        
         then Join Class as Tutor at Server end using a laptop
+        
         Then Click Join Class on the App and join as student. Checkout if Audio and Video are working fine from both ends.
 
 4. Tab 2: Has Activities of all Courses listed
@@ -79,10 +88,15 @@ d. Tutor has to login to BBB session using Moodle server login and only then Stu
     a. Choose a Course: Choose Foundational learning course as it has more activities added
     
     b. View the Activities
+    
         Try opening a File activity
+        
         Try submitting an Assignment file (same as from Tab 1)
+        
         Try joining a Video class (BBB Activity) (same as from Tab 1)
+        
         Try opening an H5P activity
 
 5. Tab 3: Currently has few features listed but not implemented
+
       Try Logout from here
