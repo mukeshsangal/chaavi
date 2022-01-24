@@ -1,0 +1,13 @@
+ion-card.md.hydrated {
+  width: 40%;
+  margin: 0 auto;
+  margin-top: 4rem;
+}
+ion-button {
+  margin: 15px 0 15px 15px;
+}
+@media (max-width: 768px) {
+  ion-card.md.hydrated {
+    width: 80%;
+  }
+}

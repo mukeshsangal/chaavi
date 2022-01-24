@@ -1,6 +1,5 @@
 <ion-header>
   <ion-toolbar>
-    <ion-button color="light" (click)="dismissLogin()">Close</ion-button>
     <ion-title>Login</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -8,19 +7,31 @@
   <form #form="ngForm" (ngSubmit)="login(form)" method="post">
     <ion-item>
       <ion-label position="floating">username</ion-label>
-      <ion-input ngModel type="text" name="username"></ion-input>
+      <ion-input
+        ngModel
+        type="text"
+        name="username"
+        autocomplete="off"
+      ></ion-input>
     </ion-item>
-  
+
     <ion-item>
       <ion-label position="floating">Password</ion-label>
-      <ion-input ngModel type="password" name="password"></ion-input>
+      <ion-input
+        ngModel
+        type="password"
+        name="password"
+        autocomplete="off"
+      ></ion-input>
     </ion-item>
-  
+
     <p text-right>Forgot Password?</p>
-  
-    <ion-button type="submit" expand="full" color="primary">Login</ion-button>
+    <ion-item>
+      <ion-button type="submit" expand="full" color="primary">Login</ion-button>
+      <ion-button color="light" (click)="dismissLogin()">Close</ion-button>
+    </ion-item>
   </form>
   <!-- Registration has been hidden for now 
-    <p text-center>Don't have an account?</p>
+  <p text-center>Don't have an account?</p>
   <ion-button expand="full" color="danger" (click)="registerModal()">Register</ion-button> -->
 </ion-content>

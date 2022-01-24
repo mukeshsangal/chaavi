@@ -1,0 +1,16 @@
+ion-content.md.hydrated {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+p {
+  margin-left: 15px;
+}
+ion-button {
+  flex: 0 0 50%;
+}
+ion-title {
+  text-align: center;
+}

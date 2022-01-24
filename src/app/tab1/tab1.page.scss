@@ -1,0 +1,36 @@
+div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 4rem;
+  flex-wrap: wrap;
+}
+ion-card {
+  flex: 0 0 30%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+@media (max-width: 768px) {
+  ion-card.md.hydrated {
+    display: block;
+    flex: 0 0 80% !important;
+  }
+}
+@media (max-width: 1566px) {
+  ion-card.md.hydrated {
+    flex: 0 0 60%;
+  }
+}
+ion-card-header.ion-inherit-color.md.hydrated {
+  flex: 1;
+}
+ion-button.md.button.button-solid.ion-activatable.ion-focusable.hydrated {
+  flex: 1;
+  margin-right: 15px;
+  margin-left: 15px;
+  margin-bottom: 15px;
+}
+ion-button.md.button.button-solid.ion-activatable.ion-focusable.hydrated {
+  min-width: 180px;
+}
