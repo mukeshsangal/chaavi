@@ -1,20 +1,20 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      My Account
-    </ion-title>
+    <ion-title> My Account </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">My Account</ion-title>
+      <ion-title size="large" class="ion-text-center">My Account</ion-title>
     </ion-toolbar>
   </ion-header>
   <ion-card>
     <ion-card-header>
-      <ion-card-title color="secondary">Features to be added here</ion-card-title>
+      <ion-card-title color="secondary" class="ion-text-center"
+        >Features to be added here</ion-card-title
+      >
     </ion-card-header>
     <ion-list>
       <ion-item>
@@ -26,9 +26,7 @@
       <ion-item>
         <ion-label>Support</ion-label>
       </ion-item>
-      <ion-button  (click)="logout()">
-        Logout
-      </ion-button>
-      </ion-list>
-</ion-card>
+      <ion-button (click)="logout()"> Logout </ion-button>
+    </ion-list>
+  </ion-card>
 </ion-content>

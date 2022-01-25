@@ -1,29 +1,26 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Notifications
-    </ion-title>
+    <ion-title> Notifications </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
-    <ion-toolbar>
+    <ion-toolbar class="ion-text-center">
       <ion-title size="large">Notifications</ion-title>
     </ion-toolbar>
   </ion-header>
   <div *ngIf="numNotifications">
-  <ion-card *ngFor="let item of events; let i=index;">
+    <ion-card *ngFor="let item of events; let i=index;">
       <ion-card-header>
         <ion-card-title color="secondary">{{item.name}}</ion-card-title>
       </ion-card-header>
       <ion-button (click)="eventActionButtonClicked(i)">
         {{item.action.name}}
       </ion-button>
-  </ion-card>
-</div>
-<ion-item *ngIf="!numNotifications">
-  No New Notifications. Checkout Courses Tab.
-</ion-item>
-
+    </ion-card>
+  </div>
+  <ion-item *ngIf="!numNotifications">
+    No New Notifications. Checkout Courses Tab.
+  </ion-item>
 </ion-content>
