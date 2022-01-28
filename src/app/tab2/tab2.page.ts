@@ -6,17 +6,20 @@ import { CourseDetails } from '../models/course-details';
 import { CourseModules } from '../models/course-modules';
 import { H5pActivities } from '../models/h5p-activities';
 
-
 import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { File, IWriteOptions } from '@ionic-native/file/ngx';
 import { HTTP } from '@ionic-native/http/ngx';
 
 import { Zip } from '@ionic-native/zip/ngx';
 
-import { NavController  } from '@ionic/angular';
+import { NavController } from '@ionic/angular';
 import { NavigationExtras, Router } from '@angular/router';
 
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Http, HttpResponse } from '@capacitor-community/http';
 import { Platform } from '@ionic/angular';
 import { retry, catchError } from 'rxjs/operators';
@@ -33,18 +36,17 @@ import { param } from 'jquery';
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
-  styleUrls: ['tab2.page.scss']
+  styleUrls: ['tab2.page.scss'],
 })
-
 
 //As of now the most important Tab Page which displays all Course details
 export class Tab2Page {
-
-  coursesData : Courses[];
-  chosenCourseSummary: String = "";
-  chosenCourseFullName: String = "";
+  coursesData: Courses[];
+  chosenCourseSummary: String = '';
+  chosenCourseFullName: String = '';
   chosenCourseId;
-  courseDetailsData : CourseDetails[];
+  detailsData: [];
+  courseDetailsData: CourseDetails[];
   h5pActivities: H5pActivities[];
 
   constructor(
@@ -52,7 +54,7 @@ export class Tab2Page {
     private file: File,
     private fileOpener: FileOpener,
     private http: HTTP,
-    private zip:Zip,
+    private zip: Zip,
     private navCtrl: NavController,
     private platform: Platform,
     private httpClient: HttpClient,
@@ -61,11 +63,10 @@ export class Tab2Page {
     private androidPermissions: AndroidPermissions,
     private router: Router,
     public envService: EnvService
-    ) {
-  }
+  ) {}
 
   ionViewWillEnter() {
-    // Used ionViewWillEnter as ngOnInit is not 
+    // Used ionViewWillEnter as ngOnInit is not
     // called due to view persistence in Ionic
     this.getAllCourses();
   }
@@ -73,177 +74,243 @@ export class Tab2Page {
   //Get list of Courses enrolled by User and list in a Dropdown
   getAllCourses() {
     //Get list of courses for the user
-    const paramString = '&userid='+this.envService.MOODLE_USER_ID;
-    this.callMoodleWs.callWS('core_enrol_get_users_courses',paramString).subscribe(response => {
-      console.log(response);
-      this.coursesData=response;
-    })
+    const paramString = '&userid=' + this.envService.MOODLE_USER_ID;
+    this.callMoodleWs
+      .callWS('core_enrol_get_users_courses', paramString)
+      .subscribe((response) => {
+        console.log(response);
+        this.coursesData = response;
+      });
   }
 
   //Function executes when a Course is selected. Displays Course details.
-  onCourseChange(event){
-
+  onCourseChange(event) {
     //Id, Summary and Name of chosen course is stored for use at various points
-    this.chosenCourseId=this.coursesData.filter(x => x.id == event.detail.value)[0].id;
-    this.chosenCourseSummary = this.coursesData.filter(x => x.id == event.detail.value)[0].summary.replace(/<\/?[^>]+(>|$)/g, "");
-    this.chosenCourseFullName = this.coursesData.filter(x => x.id == event.detail.value)[0].fullname;
-  
-      //Call Moodle WS to get details fo Chosen Course
-      const paramString = '&courseid='+this.coursesData.filter(x => x.id == event.detail.value)[0].id;
-      this.callMoodleWs.callWS('core_course_get_contents',paramString).subscribe(response => {
-        console.log(response);
-        this.courseDetailsData=response;
-        for (let i=0; i<this.courseDetailsData.length;i++){
-            this.courseDetailsData[i].summary=this.courseDetailsData[i].summary.replace(/<\/?[^>]+(>|$)/g, "");
+    this.chosenCourseId = this.coursesData.filter(
+      (x) => x.id == event.detail.value
+    )[0].id;
+    this.chosenCourseSummary = this.coursesData
+      .filter((x) => x.id == event.detail.value)[0]
+      .summary.replace(/<\/?[^>]+(>|$)/g, '');
+    this.chosenCourseFullName = this.coursesData.filter(
+      (x) => x.id == event.detail.value
+    )[0].fullname;
+
+    //Call Moodle WS to get details fo Chosen Course
+    const paramString =
+      '&courseid=' +
+      this.coursesData.filter((x) => x.id == event.detail.value)[0].id;
+    this.callMoodleWs
+      .callWS('core_course_get_contents', paramString)
+      .subscribe((response) => {
+        this.courseDetailsData = response.splice(1);
+        console.log(this.courseDetailsData, 'Course Details Here');
+        this.courseDetailsData.forEach((element) => {
+          element.modules = element.modules.filter(
+            (x) => x.modname === 'h5pactivity' && x.completiondata.state == 0
+          );
+        });
+        console.log(this.courseDetailsData, 'filter Course Details Here');
+        // data.filter((x) => {
+        //   console.log(x.modules);
+        // });
+        for (let i = 0; i < this.courseDetailsData.length; i++) {
+          this.courseDetailsData[0].summary =
+            this.courseDetailsData[0].summary.replace(/<\/?[^>]+(>|$)/g, '');
         }
+
         //console.log(this.courseDetailsData);
-      })
+      });
   }
 
   toArray(courseModules: object) {
-    return Object.keys(courseModules).map(key => courseModules[key])
+    return Object.keys(courseModules).map((key) => courseModules[key]);
   }
 
   //Function executed when User clicks on an Activity/Module within the Course
-  onModuleClick(i,j) {
-    var filepath = "";
-    //If the Course->Activity is a File Activity 
-    //then download the File and 
+  onModuleClick(i, j) {
+    var filepath = '';
+    //If the Course->Activity is a File Activity
+    //then download the File and
     //send to Appropriate app like Google Drive App
-    if (this.courseDetailsData[i].modules[j].modname == "resource")
-    {
-      const url = this.courseDetailsData[i].modules[j].contents[0].fileurl + '&token='+this.envService.MOODLE_USER_TOKEN;
-      console.log("url: ", url);
-      filepath = this.file.dataDirectory + "test.pdf";
-      console.log("filepath: ", filepath);
+    if (this.courseDetailsData[i].modules[j].modname == 'resource') {
+      const url =
+        this.courseDetailsData[i].modules[j].contents[0].fileurl +
+        '&token=' +
+        this.envService.MOODLE_USER_TOKEN;
+      console.log('url: ', url);
+      filepath = this.file.dataDirectory + 'test.pdf';
+      console.log('filepath: ', filepath);
 
-      this.http.downloadFile(url,{},{},filepath).then(response => {
-        console.log("file downloaded: ", response);
+      this.http
+        .downloadFile(url, {}, {}, filepath)
+        .then((response) => {
+          console.log('file downloaded: ', response);
 
-        this.fileOpener.open(filepath, 'application/pdf')
-        .then(() => console.log('File opened'))
-        .catch(e => console.log(e));
+          this.fileOpener
+            .open(filepath, 'application/pdf')
+            .then(() => console.log('File opened'))
+            .catch((e) => console.log(e));
+        })
+        .catch((err) => {
+          console.log('error: ', err.status);
+          console.log('error: ', err.error);
+        });
 
-      }).catch(err => {
-        console.log("error: ", err.status);
-        console.log("error: ", err.error);
-      });
-
-    //If the Course->Activity is an H5P Activity 
-    //then download the H5P File and
-    //Play the file
-      } else if(this.courseDetailsData[i].modules[j].modname=="h5pactivity") {
-        //Get H5P file URLs
-        console.log("implementing h5p");
-        const paramString = '&courseids[0]=' + this.chosenCourseId;
-        this.callMoodleWs.callWS('mod_h5pactivity_get_h5pactivities_by_courses',paramString).subscribe(response => {
+      //If the Course->Activity is an H5P Activity
+      //then download the H5P File and
+      //Play the file
+    } else if (this.courseDetailsData[i].modules[j].modname == 'h5pactivity') {
+      //Get H5P file URLs
+      console.log('implementing h5p');
+      const paramString = '&courseids[0]=' + this.chosenCourseId;
+      this.callMoodleWs
+        .callWS('mod_h5pactivity_get_h5pactivities_by_courses', paramString)
+        .subscribe((response) => {
           console.log(response);
-          this.h5pActivities=response.h5pactivities;
-          const chosenH5PActivity=this.h5pActivities.filter(x => x.coursemodule == this.courseDetailsData[i].modules[j].id);
-          console.log("chosen h5p filename: "+chosenH5PActivity[0].package[0].filename);
-          filepath="";
+          this.h5pActivities = response.h5pactivities;
+          const chosenH5PActivity = this.h5pActivities.filter(
+            (x) => x.coursemodule == this.courseDetailsData[i].modules[j].id
+          );
+          console.log(
+            'chosen h5p filename: ' + chosenH5PActivity[0].package[0].filename
+          );
+          filepath = '';
 
           //Download H5P file that is clicked
-          const url = chosenH5PActivity[0].package[0].fileurl + '?token='+this.envService.MOODLE_USER_TOKEN;
-          console.log("h5p file url: ", url);
-          filepath = this.file.dataDirectory + chosenH5PActivity[0].package[0].filename;
-          console.log("full filepath: ", filepath);
-          
-          this.http.downloadFile(url,{},{},filepath).then(response => {
-            console.log("h5p file downloaded: ", response);
-            //H5P files are Zip files. So Unzip the file first
-            this.zip.unzip(filepath, this.file.dataDirectory+"h5p", (progress) => console.log('Unzipping, ' + Math.round((progress.loaded / progress.total) * 100) + '%'))
-            .then( (result) => {
-              if(result === 0) {
-                console.log('Unzip SUCCESS');
+          const url =
+            chosenH5PActivity[0].package[0].fileurl +
+            '?token=' +
+            this.envService.MOODLE_USER_TOKEN;
+          console.log('h5p file url: ', url);
+          filepath =
+            this.file.dataDirectory + chosenH5PActivity[0].package[0].filename;
+          console.log('full filepath: ', filepath);
 
-                //Call the  h5p-standalone plugin to play H5P 
-                //after setting options like pointing to H5P file folder
-                let navigationExtras: NavigationExtras = {
-                  queryParams: {
-                    h5pFolderPath: JSON.stringify(this.file.dataDirectory+"h5p"),
-                    activityName: this.courseDetailsData[i].modules[j].name
+          this.http
+            .downloadFile(url, {}, {}, filepath)
+            .then((response) => {
+              console.log('h5p file downloaded: ', response);
+              //H5P files are Zip files. So Unzip the file first
+              this.zip
+                .unzip(filepath, this.file.dataDirectory + 'h5p', (progress) =>
+                  console.log(
+                    'Unzipping, ' +
+                      Math.round((progress.loaded / progress.total) * 100) +
+                      '%'
+                  )
+                )
+                .then((result) => {
+                  if (result === 0) {
+                    console.log('Unzip SUCCESS');
+
+                    //Call the  h5p-standalone plugin to play H5P
+                    //after setting options like pointing to H5P file folder
+                    let navigationExtras: NavigationExtras = {
+                      queryParams: {
+                        h5pFolderPath: JSON.stringify(
+                          this.file.dataDirectory + 'h5p'
+                        ),
+                        activityName: this.courseDetailsData[i].modules[j].name,
+                      },
+                    };
+                    console.log(
+                      'activity name: ',
+                      this.courseDetailsData[i].modules[j].name
+                    );
+                    this.navCtrl.navigateForward(
+                      ['/tabs/tab2/h5p-display'],
+                      navigationExtras
+                    );
                   }
-                };
-                console.log("activity name: ", this.courseDetailsData[i].modules[j].name);
-                this.navCtrl.navigateForward(['/tabs/tab2/h5p-display'], navigationExtras);
-              }
-              if(result === -1) { console.log('FAILED');}
+                  if (result === -1) {
+                    console.log('FAILED');
+                  }
+                });
             })
-          }).catch(err => {
-            console.log("error: ", err.status);
-            console.log("error: ", err.error);
-          });
-          })
+            .catch((err) => {
+              console.log('error: ', err.status);
+              console.log('error: ', err.error);
+            });
+        });
 
-      ////If the Course->Activity is a BigBlueButton Activity 
+      ////If the Course->Activity is a BigBlueButton Activity
       //then...
-      }  else if(this.courseDetailsData[i].modules[j].modname=="bigbluebuttonbn") {
-          console.log("implement BBB");
+    } else if (
+      this.courseDetailsData[i].modules[j].modname == 'bigbluebuttonbn'
+    ) {
+      console.log('implement BBB');
 
-          //Call the BigBlueButton page to Join Session
-          let navigationExtras: NavigationExtras = {
-            queryParams: {
-              cmid: this.courseDetailsData[i].modules[j].id,
-              courseid: this.courseDetailsData[i].id
-            }
-          };
-          console.log("activity name: ", this.courseDetailsData[i].modules[j].name);
-          this.navCtrl.navigateForward(['/tabs/tab2/bigbluebutton'], navigationExtras);
+      //Call the BigBlueButton page to Join Session
+      let navigationExtras: NavigationExtras = {
+        queryParams: {
+          cmid: this.courseDetailsData[i].modules[j].id,
+          courseid: this.courseDetailsData[i].id,
+        },
+      };
+      console.log('activity name: ', this.courseDetailsData[i].modules[j].name);
+      this.navCtrl.navigateForward(
+        ['/tabs/tab2/bigbluebutton'],
+        navigationExtras
+      );
+    } else if (this.courseDetailsData[i].modules[j].modname == 'assign') {
+      console.log('implement Assignment');
 
-      } else if(this.courseDetailsData[i].modules[j].modname=="assign") {
-        console.log("implement Assignment");
-        
-          //Call the Assignment page
-           let navigationExtras: NavigationExtras = {
-            state: {
-              courseModule: this.courseDetailsData[i].modules[j],
-              chosenCourseId: this.chosenCourseId
-            }
-          };
-          console.log("activity name: ", this.courseDetailsData[i].modules[j].name);
-           this.router.navigate(['/tabs/tab2/assignment'],navigationExtras);
-      } 
+      //Call the Assignment page
+      let navigationExtras: NavigationExtras = {
+        state: {
+          courseModule: this.courseDetailsData[i].modules[j],
+          chosenCourseId: this.chosenCourseId,
+        },
+      };
+      console.log('activity name: ', this.courseDetailsData[i].modules[j].name);
+      this.router.navigate(['/tabs/tab2/assignment'], navigationExtras);
     }
+  }
 
-    //Function which changes the completion status of the Activity from Mark Done to Done and vice-versa
-    completionClicked(i,j){
-      const newstate = (this.courseDetailsData[i].modules[j].completiondata.state? 0:1);
-    
+  //Function which changes the completion status of the Activity from Mark Done to Done and vice-versa
+  completionClicked(i, j) {
+    const newstate = this.courseDetailsData[i].modules[j].completiondata.state
+      ? 0
+      : 1;
+
     //Call Moodle WS function to change Activity's completion status
-    const paramString = '&cmid='+this.courseDetailsData[i].modules[j].id+'&completed='+newstate;
-    this.callMoodleWs.callWS('core_completion_update_activity_completion_status_manually', paramString).subscribe(response => {
-      console.log(response);
-      this.courseDetailsData[i].modules[j].completiondata.state=newstate;
-    })
-
+    const paramString =
+      '&cmid=' +
+      this.courseDetailsData[i].modules[j].id +
+      '&completed=' +
+      newstate;
+    this.callMoodleWs
+      .callWS(
+        'core_completion_update_activity_completion_status_manually',
+        paramString
+      )
+      .subscribe((response) => {
+        console.log(response);
+        this.courseDetailsData[i].modules[j].completiondata.state = newstate;
+      });
   }
 
-
-
-    // Handle API errors
-handleError(error: HttpErrorResponse) {
-  if (error.error instanceof ErrorEvent) {
-    // A client-side or network error occurred. Handle it accordingly.
-    console.error('An error occurred:', error.error.message);
-  } else {
-    // The backend returned an unsuccessful response code.
-    // The response body may contain clues as to what went wrong,
-    console.error(
-      `Backend returned code ${error.status}, ` +
-      `body was: ${error.error}`);
+  // Handle API errors
+  handleError(error: HttpErrorResponse) {
+    if (error.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      console.error('An error occurred:', error.error.message);
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong,
+      console.error(
+        `Backend returned code ${error.status}, ` + `body was: ${error.error}`
+      );
+    }
+    // return an observable with a user-facing error message
+    return throwError('Something bad happened; please try again later.');
   }
-  // return an observable with a user-facing error message
-  return throwError(
-    'Something bad happened; please try again later.');
-}
 
-
-
-//This was an attempt to open BBB video call within App using InAppBrowser. It didnt work.
-//This code was to set Camera and Microphone permissions
-//Get Microphone and Camera permission at runtime before opening InAppBrowser
-/* var cameraPermission=0;
+  //This was an attempt to open BBB video call within App using InAppBrowser. It didnt work.
+  //This code was to set Camera and Microphone permissions
+  //Get Microphone and Camera permission at runtime before opening InAppBrowser
+  /* var cameraPermission=0;
 var microphonePermission=0;
 let permissionStatus = this.diagnostic.permissionStatus;
 this.diagnostic.getCameraAuthorizationStatus()
@@ -304,9 +371,9 @@ if (microphonePermission == 0 && cameraPermission == 0) {
   );
 } */
 
-//another inappbrowser attempt
-                  //var permissions = this.androidPermissions.PERMISSION;
-/*                   var permList = [
+  //another inappbrowser attempt
+  //var permissions = this.androidPermissions.PERMISSION;
+  /*                   var permList = [
                     this.androidPermissions.PERMISSION.RECORD_AUDIO,
                     this.androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS,
                     this.androidPermissions.PERMISSION.CAPTURE_AUDIO_OUTPUT,
@@ -315,6 +382,4 @@ if (microphonePermission == 0 && cameraPermission == 0) {
                   await this.androidPermissions.requestPermissions(permList);
                   const browser = this.iab.create(result.url[0],'_self', "location=no");
                     //, this.permCallBackSuccess(result.url[0]), this.permCallBackError); */
-
-                    
 }
