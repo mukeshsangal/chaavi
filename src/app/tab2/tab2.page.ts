@@ -103,17 +103,26 @@ export class Tab2Page {
     this.callMoodleWs
       .callWS('core_course_get_contents', paramString)
       .subscribe((response) => {
-        this.courseDetailsData = response.splice(1);
-        console.log(this.courseDetailsData, 'Course Details Here');
-        this.courseDetailsData.forEach((element) => {
-          element.modules = element.modules.filter(
-            (x) => x.modname === 'h5pactivity' && x.completiondata.state == 0
-          );
-        });
-        console.log(this.courseDetailsData, 'filter Course Details Here');
-        // data.filter((x) => {
-        //   console.log(x.modules);
+        const courseDetailsData = response.splice(1);
+        var CurrentLevel;
+        this.courseDetailsData = courseDetailsData
+          .map((element) => {
+            return {
+              ...element,
+              modules: element.modules.filter(
+                (x) =>
+                  x.modname === 'h5pactivity' && x.completiondata.state == 0
+              ),
+            };
+          })
+          .filter((element) => {
+            return element.modules.length;
+          });
+        // const state = this.courseDetailsData[0].modules[0].filter((element) => {
+        //   console.log(element, 'index');
         // });
+        // console.log(state, 'COmpletion Dtata');
+        // console.log(this.courseDetailsData, 'filter Course Details Here');
         for (let i = 0; i < this.courseDetailsData.length; i++) {
           this.courseDetailsData[0].summary =
             this.courseDetailsData[0].summary.replace(/<\/?[^>]+(>|$)/g, '');
