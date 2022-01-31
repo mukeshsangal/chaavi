@@ -48,6 +48,7 @@ export class Tab2Page {
   detailsData: [];
   courseDetailsData: CourseDetails[];
   h5pActivities: H5pActivities[];
+  currentLevel: String = '';
 
   constructor(
     private callMoodleWs: CallMoodleWsService,
@@ -83,6 +84,29 @@ export class Tab2Page {
       });
   }
 
+  // Filter modules
+  filterModules(modules, levelId) {
+    let currentModule = null;
+
+    return modules.filter((x) => {
+      if (currentModule) {
+        return false;
+      }
+
+      if (
+        !currentModule &&
+        x.modname === 'h5pactivity' &&
+        x.completiondata.state == 0
+      ) {
+        this.currentLevel = levelId;
+        console.log(this.currentLevel, 'CurrentLevel');
+        currentModule = x.id;
+        return true;
+      }
+
+      return false; //x.modname === 'h5pactivity' && x.completiondata.state == 0;
+    });
+  }
   //Function executes when a Course is selected. Displays Course details.
   onCourseChange(event) {
     //Id, Summary and Name of chosen course is stored for use at various points
@@ -95,7 +119,7 @@ export class Tab2Page {
     this.chosenCourseFullName = this.coursesData.filter(
       (x) => x.id == event.detail.value
     )[0].fullname;
-
+    this.currentLevel = null;
     //Call Moodle WS to get details fo Chosen Course
     const paramString =
       '&courseid=' +
@@ -104,25 +128,22 @@ export class Tab2Page {
       .callWS('core_course_get_contents', paramString)
       .subscribe((response) => {
         const courseDetailsData = response.splice(1);
-        var CurrentLevel;
+        // console.log(JSON.stringify(courseDetailsData));
         this.courseDetailsData = courseDetailsData
           .map((element) => {
+            // Check for Current Level If exist then return emplty array else return modules.
+            const modules = this.currentLevel ? [] : element.modules;
+            const filteredModules = this.filterModules(modules, element.id);
+            console.log(filteredModules, 'Filtered Nodules');
             return {
               ...element,
-              modules: element.modules.filter(
-                (x) =>
-                  x.modname === 'h5pactivity' && x.completiondata.state == 0
-              ),
+              modules: filteredModules,
             };
           })
           .filter((element) => {
             return element.modules.length;
           });
-        // const state = this.courseDetailsData[0].modules[0].filter((element) => {
-        //   console.log(element, 'index');
-        // });
-        // console.log(state, 'COmpletion Dtata');
-        // console.log(this.courseDetailsData, 'filter Course Details Here');
+
         for (let i = 0; i < this.courseDetailsData.length; i++) {
           this.courseDetailsData[0].summary =
             this.courseDetailsData[0].summary.replace(/<\/?[^>]+(>|$)/g, '');
