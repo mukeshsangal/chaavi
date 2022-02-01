@@ -1,6 +1,11 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title align="center"> Courses </ion-title>
+    <ion-title *ngIf="chosenCourseFullName == ''" class="ion-text-center">
+      Courses</ion-title
+    >
+    <ion-title *ngIf="chosenCourseFullName !== ''" class="ion-text-center">
+      Course - {{chosenCourseFullName}}
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -22,7 +27,7 @@
   </ion-item>
 
   <!-- Details of Chosen course -->
-  <ion-card *ngIf="chosenCourseFullName !== ''">
+  <!-- <ion-card *ngIf="chosenCourseFullName !== ''">
     <ion-icon
       name="book-outline"
       className="center-right"
@@ -36,10 +41,10 @@
       >
     </ion-card-header>
     <ion-card-content>
-      <!-- <div *ngIf="$event.detail.value !== item.id " >{{item.summary}}</div> -->
-      <div *ngIf="chosenCourseSummary !== ''">{{chosenCourseSummary}}</div>
+       <div *ngIf="$event.detail.value !== item.id " >{{item.summary}}</div> -->
+  <!-- <div *ngIf="chosenCourseSummary !== ''">{{chosenCourseSummary}}</div>
     </ion-card-content>
-  </ion-card>
+  </ion-card> -->
 
   <!-- List of Sections of the Chosen Course-->
   <div *ngIf="chosenCourseFullName !== ''">

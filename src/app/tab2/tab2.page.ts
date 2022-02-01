@@ -131,7 +131,7 @@ export class Tab2Page {
         // console.log(JSON.stringify(courseDetailsData));
         this.courseDetailsData = courseDetailsData
           .map((element) => {
-            // Check for Current Level If exist then return emplty array else return modules.
+            // Check for Current Level If exist then return empty array else return modules.
             const modules = this.currentLevel ? [] : element.modules;
             const filteredModules = this.filterModules(modules, element.id);
             console.log(filteredModules, 'Filtered Nodules');
@@ -193,11 +193,27 @@ export class Tab2Page {
     } else if (this.courseDetailsData[i].modules[j].modname == 'h5pactivity') {
       //Get H5P file URLs
       console.log('implementing h5p');
+      // let details = navigator.userAgent;
+
+      // /* Creating a regular expression
+      //   containing some mobile devices keywords
+      //   to search it in details string*/
+      // let regexp = /android|iphone|kindle|ipad/i;
+
+      // /* Using test() method to search regexp in details
+      //   it returns boolean value*/
+      // let isMobileDevice = regexp.test(details);
+
+      // if (isMobileDevice) {
+      //   console.log('You are using a Mobile Device');
+      // } else {
+      //   console.log('You are using Desktop');
+      // }
       const paramString = '&courseids[0]=' + this.chosenCourseId;
       this.callMoodleWs
         .callWS('mod_h5pactivity_get_h5pactivities_by_courses', paramString)
         .subscribe((response) => {
-          console.log(response);
+          console.log(response, 'files responses');
           this.h5pActivities = response.h5pactivities;
           const chosenH5PActivity = this.h5pActivities.filter(
             (x) => x.coursemodule == this.courseDetailsData[i].modules[j].id
