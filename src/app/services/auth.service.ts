@@ -5,6 +5,7 @@ import { NativeStorage } from '@ionic-native/native-storage/ngx';
 import { EnvService } from './env.service';
 import { User } from '../models/user';
 import { NavController } from '@ionic/angular';
+import { CallMoodleWsService } from '../services/call-moodle-ws.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,49 +14,56 @@ import { NavController } from '@ionic/angular';
 //For handling all Auth services: login, registration, logout
 export class AuthService {
   isLoggedIn = false;
-  token:any;
+  token: any;
   constructor(
     private http: HttpClient,
     private storage: NativeStorage,
     public envService: EnvService,
-    private navCtrl: NavController
-  ) 
-  { }
+    private navCtrl: NavController,
+    private callMoodleWs: CallMoodleWsService
+  ) { }
 
   login(username: String, password: String) {
     var token;
 
     //Calling Moodle login.php here with username/pwd to get user Token
     //Every Moodle Web Services call (eg: get courses, get action items) works only if this Token is passed
-    return this.http.get<any>(this.envService.MOODLE_LOGIN_URL + '?username='+ username+'&password='+password + '&service=moodle_mobile_app')
-    .pipe(
-      tap(response => {
-        token = response.token;
-        console.log(token);
-        if(token !== undefined) {
-          //Token is stored in mobile local storage for login persistence
-          this.storage.setItem('token', token)
-          .then(
-            () => {
-              console.log('Token Stored');
-            },
-            error => console.error('Error storing item', error)
-          );
-          this.token = token;
-          this.isLoggedIn = true;
-          //User Id # is Hardcoded for now. Later change it to call MOODLE API to find userid for the entered username and set it here
-          this.envService.MOODLE_USER_ID=6;
-          this.envService.MOODLE_USER_TOKEN=token;
-        }
-        else token=null;
-        //return token;
-      }),
-    );
+    return this.http.get<any>(this.envService.MOODLE_LOGIN_URL + '?username=' + username + '&password=' + password + '&service=moodle_mobile_app')
+      .pipe(
+        tap(response => {
+          token = response.token;
+          //console.log(response);
+
+          if (token !== undefined) {
+            //Token is stored in mobile local storage for login persistence
+            this.storage.setItem('token', token)
+              .then(
+                () => {
+                  console.log('Token Stored');
+                },
+                error => console.error('Error storing item', error)
+              );
+            this.token = token;
+            this.isLoggedIn = true;
+            //User Id # is Hardcoded for now. Later change it to call MOODLE API to find userid for the entered username and set it here
+            //this.envService.MOODLE_USER_ID = 4;
+            this.envService.MOODLE_USER_TOKEN = token;
+            const paramString = '&field=username&values[]=' + username;
+            this.callMoodleWs
+              .callWS('core_user_get_users_by_field', paramString)
+              .subscribe((response1) => {
+                this.envService.MOODLE_USER_ID = response1[0].id;
+              });
+          }
+          else token = null;
+          //return token;
+        }),
+      );
   }
 
   register(fName: String, lName: String, email: String, password: String) {
     return this.http.post(this.envService.MOODLE_API_URL + 'auth/register',
-      {fName: fName, lName: lName, email: email, password: password}
+      { fName: fName, lName: lName, email: email, password: password }
     )
   }
   logout() {
@@ -73,7 +81,7 @@ export class AuthService {
         return data;
       })
     ) */
-    
+
     //Currently Logout just means remove the token from local storage and setting status as not logged in
     this.storage.remove("token");
     this.isLoggedIn = false;
@@ -100,18 +108,18 @@ export class AuthService {
     return this.storage.getItem('token').then(
       data => {
         this.token = data;
-        if(this.token != null) {
-          this.isLoggedIn=true;
-          //User Id # is Hardcoded for now. Later change it to call MOODLE API to find userid for the entered username and set it here          
-          this.envService.MOODLE_USER_ID=6;
-          this.envService.MOODLE_USER_TOKEN=this.token;          
+        if (this.token != null) {
+          this.isLoggedIn = true;
+          //User Id # is Hardcoded for now. Later change it to call MOODLE API to find userid for the entered username and set it here
+          this.envService.MOODLE_USER_ID = 6;
+          this.envService.MOODLE_USER_TOKEN = this.token;
         } else {
-          this.isLoggedIn=false;
+          this.isLoggedIn = false;
         }
       },
       error => {
         this.token = null;
-        this.isLoggedIn=false;
+        this.isLoggedIn = false;
       }
     );
   }
