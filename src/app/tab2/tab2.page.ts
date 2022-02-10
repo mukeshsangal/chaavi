@@ -230,7 +230,8 @@ export class Tab2Page {
             this.envService.MOODLE_USER_TOKEN;
           console.log('h5p file url: ', url);
           filepath =
-            this.file.dataDirectory + chosenH5PActivity[0].package[0].filename;
+            this.file.dataDirectory +
+            chosenH5PActivity[0].package[0].filename.replace(/ /g, '_');
           console.log('full filepath: ', filepath);
 
           this.http
