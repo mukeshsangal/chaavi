@@ -45,9 +45,9 @@ export class AuthService {
               );
             this.token = token;
             this.isLoggedIn = true;
-            //User Id # is Hardcoded for now. Later change it to call MOODLE API to find userid for the entered username and set it here
-            //this.envService.MOODLE_USER_ID = 4;
             this.envService.MOODLE_USER_TOKEN = token;
+
+            // get the user object to set user id.
             const paramString = '&field=username&values[]=' + username;
             this.callMoodleWs
               .callWS('core_user_get_users_by_field', paramString)
